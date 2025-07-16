@@ -3,46 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <title>My Chill Videos</title>
-  <style>
-    body {
-      background: #1b1b1b;
-      color: white;
-      font-family: sans-serif;
-      padding: 20px;
-    }
-    .video-container {
-      margin-bottom: 30px;
-    }
-    video {
-      width: 100%;
-      max-height: 400px;
-    }
-    input {
-      width: 100%;
-      background: #333;
-      color: #ccc;
-      border: 1px solid #555;
-      padding: 5px;
-      margin-top: 5px;
-    }
-    button {
-      margin-top: 5px;
-      padding: 5px 10px;
-      background-color: #444;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- ✅ Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h1>🎬 Chill Videos (Auto-Listed)</h1>
-  <div id="videos">Loading videos...</div>
+<body class="bg-gray-900 text-white min-h-screen py-10 px-4 sm:px-8">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8 text-center">🎬 Chill Videos (Auto-Listed)</h1>
+    <div id="videos" class="space-y-10">Loading videos...</div>
+  </div>
 
   <script>
     const GITHUB_USERNAME = "11nawid";
     const REPO_NAME = "bgvideos";
-    const FOLDER = ""; // root folder
+    const FOLDER = ""; // Leave blank if files are in root
 
     const API_URL = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents/${FOLDER}`;
     const RAW_URL_BASE = `https://${GITHUB_USERNAME}.github.io/${REPO_NAME}/${FOLDER}`;
@@ -61,24 +35,26 @@
         container.innerHTML = "";
 
         if (videoFiles.length === 0) {
-          container.innerHTML = "<p>No videos found.</p>";
+          container.innerHTML = "<p class='text-center text-red-400'>No videos found.</p>";
           return;
         }
 
         videoFiles.forEach(file => {
           const fileURL = `${RAW_URL_BASE ? RAW_URL_BASE + "/" : ""}${file.name}`;
           const div = document.createElement("div");
-          div.className = "video-container";
+          div.className = "bg-gray-800 rounded-lg shadow p-6";
           div.innerHTML = `
-            <h3>${file.name}</h3>
-            <video src="${fileURL}" controls loop></video><br>
-            <input value="${fileURL}" readonly>
-            <button onclick="copyURL(this)">Copy URL</button>
+            <h3 class="text-xl font-semibold mb-4">${file.name}</h3>
+            <video class="w-full max-h-[400px] rounded" src="${fileURL}" controls loop></video>
+            <div class="mt-4">
+              <input class="w-full bg-gray-700 text-gray-200 px-3 py-2 rounded border border-gray-600 focus:outline-none" value="${fileURL}" readonly>
+              <button onclick="copyURL(this)" class="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded">📋 Copy URL</button>
+            </div>
           `;
           container.appendChild(div);
         });
       } catch (err) {
-        document.getElementById("videos").innerHTML = `<p style="color: red;">Failed to load videos: ${err.message}</p>`;
+        document.getElementById("videos").innerHTML = `<p class='text-center text-red-400'>Failed to load videos: ${err.message}</p>`;
       }
     }
 
@@ -86,7 +62,8 @@
       const input = button.previousElementSibling;
       input.select();
       document.execCommand("copy");
-      alert("Copied: " + input.value);
+      button.innerText = "✅ Copied!";
+      setTimeout(() => (button.innerText = "📋 Copy URL"), 1500);
     }
 
     fetchVideos();
